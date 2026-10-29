@@ -1,39 +1,29 @@
-
 local BASE_URL = "https://wdasdwasdw-consolehook.mia0.amvera.tech"
 local SCRIPT_ID = "vessel_v19"
-
+local TG_BOT_URL = "https://t.me/VesselKeyBot"
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-
-
-if game.CoreGui:FindFirstChild("VesselLoader") then
-    game.CoreGui.VesselLoader:Destroy()
-end
-
+local GuiService = game:GetService("GuiService")
+if game.CoreGui:FindFirstChild("VesselLoader") then game.CoreGui.VesselLoader:Destroy() end
 local gui = Instance.new("ScreenGui")
 gui.Name = "VesselLoader"
 gui.ResetOnSpawn = false
 gui.Parent = game.CoreGui
-
-
 local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 320, 0, 180)
-main.Position = UDim2.new(0.5, -160, 0.5, -90)
+main.Size = UDim2.new(0, 320, 0, 220)
+main.Position = UDim2.new(0.5, -160, 0.5, -110)
 main.BackgroundColor3 = Color3.fromRGB(10, 15, 12)
 main.BorderSizePixel = 0
 main.Active = true
 main.Draggable = true
 main.Parent = gui
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 8)
-
 local stroke = Instance.new("UIStroke", main)
 stroke.Color = Color3.fromRGB(0, 255, 136)
 stroke.Thickness = 1.5
 stroke.Transparency = 0.3
-
-
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 35)
 title.BackgroundColor3 = Color3.fromRGB(15, 25, 20)
@@ -44,8 +34,6 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 16
 title.Parent = main
 Instance.new("UICorner", title).CornerRadius = UDim.new(0, 8)
-
-
 local keyBox = Instance.new("TextBox")
 keyBox.Size = UDim2.new(1, -40, 0, 35)
 keyBox.Position = UDim2.new(0, 20, 0, 50)
@@ -62,8 +50,6 @@ Instance.new("UICorner", keyBox).CornerRadius = UDim.new(0, 6)
 local boxStroke = Instance.new("UIStroke", keyBox)
 boxStroke.Color = Color3.fromRGB(30, 60, 40)
 boxStroke.Thickness = 1
-
-
 local btn = Instance.new("TextButton")
 btn.Size = UDim2.new(1, -40, 0, 35)
 btn.Position = UDim2.new(0, 20, 0, 100)
@@ -74,8 +60,16 @@ btn.TextSize = 15
 btn.Text = "АВТОРИЗАЦИЯ"
 btn.Parent = main
 Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-
-
+local getKeyBtn = Instance.new("TextButton")
+getKeyBtn.Size = UDim2.new(1, -40, 0, 30)
+getKeyBtn.Position = UDim2.new(0, 20, 0, 170)
+getKeyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+getKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+getKeyBtn.Font = Enum.Font.GothamBold
+getKeyBtn.TextSize = 14
+getKeyBtn.Text = "🔑 ПОЛУЧИТЬ КЛЮЧ (GET KEY)"
+getKeyBtn.Parent = main
+Instance.new("UICorner", getKeyBtn).CornerRadius = UDim.new(0, 6)
 local status = Instance.new("TextLabel")
 status.Size = UDim2.new(1, -40, 0, 20)
 status.Position = UDim2.new(0, 20, 0, 145)
@@ -86,8 +80,17 @@ status.TextSize = 12
 status.Text = "Ожидание ключа..."
 status.TextXAlignment = Enum.TextXAlignment.Left
 status.Parent = main
-
-
+getKeyBtn.MouseButton1Click:Connect(function()
+    pcall(function() GuiService:OpenBrowserWindow(TG_BOT_URL) end)
+    pcall(function() setclipboard(TG_BOT_URL) end)
+    status.Text = "✅ Ссылка скопирована / Открывается браузер!"
+    status.TextColor3 = Color3.fromRGB(0, 120, 255)
+    task.wait(3)
+    if status.Parent then
+        status.Text = "Ожидание ключа..."
+        status.TextColor3 = Color3.fromRGB(150, 200, 170)
+    end
+end)
 btn.MouseButton1Click:Connect(function()
     local key = keyBox.Text:gsub("%s+", "")
     if key == "" then
@@ -95,20 +98,14 @@ btn.MouseButton1Click:Connect(function()
         status.TextColor3 = Color3.fromRGB(255, 80, 80)
         return
     end
-
     status.Text = "⏳ Подключение к серверу..."
     status.TextColor3 = Color3.fromRGB(255, 200, 50)
     btn.Text = "..."
     btn.BackgroundColor3 = Color3.fromRGB(0, 150, 80)
-
     local hwid = tostring(Players.LocalPlayer.UserId)
     local nonce = tostring(math.random(100000, 999999))
     local authUrl = BASE_URL .. "/auth?key=" .. key .. "&hwid=" .. hwid .. "&nonce=" .. nonce .. "&script=" .. SCRIPT_ID
-
-    local success, response = pcall(function()
-        return game:HttpGet(authUrl)
-    end)
-
+    local success, response = pcall(function() return game:HttpGet(authUrl) end)
     if not success then
         status.Text = "❌ Ошибка сети. Сервер недоступен."
         status.TextColor3 = Color3.fromRGB(255, 80, 80)
@@ -116,32 +113,17 @@ btn.MouseButton1Click:Connect(function()
         btn.BackgroundColor3 = Color3.fromRGB(0, 255, 136)
         return
     end
-
     local data = HttpService:JSONDecode(response)
-
     if data.ok then
         status.Text = "✅ Успешно! Загрузка..."
         status.TextColor3 = Color3.fromRGB(0, 255, 136)
-        
-        
-        _G.VesselAuth = {
-            session = data.session_id,
-            nonce = nonce,
-            base_url = BASE_URL
-        }
-
+        _G.VesselAuth = { session = data.session_id, nonce = nonce, base_url = BASE_URL }
         task.wait(0.5)
-
-        local s, scriptCode = pcall(function()
-            return game:HttpGet(data.script_url)
-        end)
-
+        local s, scriptCode = pcall(function() return game:HttpGet(data.script_url) end)
         if s then
-            local loadSuccess, err = pcall(function()
-                loadstring(scriptCode)()
-            end)
+            local loadSuccess, err = pcall(function() loadstring(scriptCode)() end)
             if loadSuccess then
-                gui:Destroy() 
+                gui:Destroy()
             else
                 status.Text = "❌ Ошибка в коде: " .. tostring(err)
                 status.TextColor3 = Color3.fromRGB(255, 80, 80)
