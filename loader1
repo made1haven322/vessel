@@ -1,6 +1,7 @@
 local BASE_URL = "https://wdasdwasdw-consolehook.mia0.amvera.tech"
 local SCRIPT_ID = "vessel_v19"
 local TG_BOT_URL = "https://t.me/VesselKeyBot"
+local TG_CHANNEL_URL = "https://t.me/broodhubnews"
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
@@ -12,8 +13,8 @@ gui.Name = "VesselLoader"
 gui.ResetOnSpawn = false
 gui.Parent = game.CoreGui
 local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 320, 0, 220)
-main.Position = UDim2.new(0.5, -160, 0.5, -110)
+main.Size = UDim2.new(0, 320, 0, 260)
+main.Position = UDim2.new(0.5, -160, 0.5, -130)
 main.BackgroundColor3 = Color3.fromRGB(10, 15, 12)
 main.BorderSizePixel = 0
 main.Active = true
@@ -70,6 +71,16 @@ getKeyBtn.TextSize = 14
 getKeyBtn.Text = "🔑 ПОЛУЧИТЬ КЛЮЧ (GET KEY)"
 getKeyBtn.Parent = main
 Instance.new("UICorner", getKeyBtn).CornerRadius = UDim.new(0, 6)
+local channelBtn = Instance.new("TextButton")
+channelBtn.Size = UDim2.new(1, -40, 0, 30)
+channelBtn.Position = UDim2.new(0, 20, 0, 210)
+channelBtn.BackgroundColor3 = Color3.fromRGB(120, 80, 255)
+channelBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+channelBtn.Font = Enum.Font.GothamBold
+channelBtn.TextSize = 14
+channelBtn.Text = "📢 МОЙ КАНАЛ (MY CHANNEL)"
+channelBtn.Parent = main
+Instance.new("UICorner", channelBtn).CornerRadius = UDim.new(0, 6)
 local status = Instance.new("TextLabel")
 status.Size = UDim2.new(1, -40, 0, 20)
 status.Position = UDim2.new(0, 20, 0, 145)
@@ -85,6 +96,17 @@ getKeyBtn.MouseButton1Click:Connect(function()
     pcall(function() setclipboard(TG_BOT_URL) end)
     status.Text = "✅ Ссылка скопирована / Открывается браузер!"
     status.TextColor3 = Color3.fromRGB(0, 120, 255)
+    task.wait(3)
+    if status.Parent then
+        status.Text = "Ожидание ключа..."
+        status.TextColor3 = Color3.fromRGB(150, 200, 170)
+    end
+end)
+channelBtn.MouseButton1Click:Connect(function()
+    pcall(function() GuiService:OpenBrowserWindow(TG_CHANNEL_URL) end)
+    pcall(function() setclipboard(TG_CHANNEL_URL) end)
+    status.Text = "✅ Ссылка на канал скопирована!"
+    status.TextColor3 = Color3.fromRGB(120, 80, 255)
     task.wait(3)
     if status.Parent then
         status.Text = "Ожидание ключа..."
